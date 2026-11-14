@@ -15,7 +15,7 @@
 python -m http.server 8449 --directory site
 ```
 
-然后打开 http://localhost:8449 。链接可直达：`#mask/baozheng`、`#costume/xiangyu`、`#costume/guanyu/zhangfei`（给绿蟒换上张飞的脸）。
+然后打开 http://localhost:8449 。在线版：https://liyucheng1997.github.io/449_lab-beijing-opera/链接可直达：`#mask/baozheng`、`#costume/xiangyu`、`#costume/guanyu/zhangfei`（给绿蟒换上张飞的脸）。
 
 ## 重建模型
 
