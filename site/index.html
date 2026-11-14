@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>京剧脸谱与戏服 3D</title>
+  <meta name="description" content="用 Blender 建模的京剧脸谱、盔头、髯口与戏服 3D 展示，可旋转、缩放、换脸。" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%231d1d1f'/%3E%3Ctext x='16' y='22.5' font-size='17' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='600'%3E%E8%B0%B1%3C/text%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="css/tokens.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <script>
+    try { const t = localStorage.getItem('theme'); if (t) document.documentElement.dataset.theme = t; else if (matchMedia('(prefers-color-scheme: dark)').matches) document.documentElement.dataset.theme = 'dark'; } catch (e) {}
+  </script>
+  <script type="importmap">
+    { "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+    } }
+  </script>
+</head>
+<body>
+  <header class="titlebar">
+    <div class="brand">
+      <div class="logo-mark">谱</div>
+      <div class="brand-text">
+        <div class="brand-name">京剧 · 脸谱与戏服</div>
+        <div class="brand-sub">Blender 建模 · 3D 展示</div>
+      </div>
+    </div>
+    <div class="seg" id="modeSeg" role="tablist">
+      <button class="active" data-mode="mask" role="tab">脸谱</button>
+      <button data-mode="costume" role="tab">戏服</button>
+    </div>
+    <button class="tb-round" id="themeBtn" title="切换深色 / 浅色" aria-label="切换主题">
+      <svg class="ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+    </button>
+  </header>
+
+  <main class="page">
+    <section class="hero">
+      <div class="kicker" id="kicker">LIAN PU · 脸谱</div>
+      <h1 id="heroTitle">一张脸，就是一个<span class="hl">性格</span></h1>
+      <p class="lede" id="heroLede">拖动旋转、滚轮缩放。每一张脸谱都在真实头部模型上绘制，配上盔头与髯口，可以随时摘下来细看。</p>
+    </section>
+
+    <section class="stage-wrap">
+      <div class="card stage" id="stage">
+        <canvas id="view"></canvas>
+        <div class="stage-loading" id="loading"><div class="spinner"></div><span id="loadingText">正在加载模型…</span></div>
+        <div class="stage-bar">
+          <div class="seg seg-dark" id="lightSeg">
+            <button class="active" data-light="stage">舞台光</button>
+            <button data-light="soft">柔光</button>
+          </div>
+          <div class="bar-actions">
+            <button class="chip-dark active" id="rotBtn" title="自动旋转">自动旋转</button>
+            <button class="icon-dark" id="resetBtn" title="重置视角" aria-label="重置视角">
+              <svg class="ico" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>
+            </button>
+            <button class="icon-dark" id="shotBtn" title="保存截图" aria-label="保存截图">
+              <svg class="ico" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="stage-hint">拖动旋转 · 滚轮 / 双指缩放 · 右键平移</div>
+      </div>
+
+      <aside class="card info" id="info">
+        <div class="info-head">
+          <div class="info-swatch" id="infoSwatch"></div>
+          <div>
+            <div class="info-type" id="infoType"></div>
+            <h2 class="info-name" id="infoName"></h2>
+          </div>
+        </div>
+        <dl class="facts" id="facts"></dl>
+        <p class="info-desc" id="infoDesc"></p>
+        <div class="toggles" id="toggles"></div>
+      </aside>
+    </section>
+
+    <section class="gallery">
+      <div class="sec-head">
+        <div>
+          <div class="sec-kicker" id="galKicker">GALLERY</div>
+          <h3 class="sec-title" id="galTitle">八张脸谱</h3>
+        </div>
+        <div class="sec-note" id="galNote">点击切换</div>
+      </div>
+      <div class="grid" id="grid"></div>
+    </section>
+
+    <section class="meaning" id="meaning">
+      <div class="sec-head">
+        <div>
+          <div class="sec-kicker">COLORS</div>
+          <h3 class="sec-title">脸谱的颜色在说话</h3>
+        </div>
+      </div>
+      <div class="colors" id="colors"></div>
+    </section>
+
+    <footer class="foot">
+      模型与贴图均由 Blender 脚本程序化生成（头部 SDF 雕刻、手绘式脸谱贴图、刺绣纹样、发丝卡片），纹样为风格化再现，细节以舞台实物为准。
+    </footer>
+  </main>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
